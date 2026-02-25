@@ -1,7 +1,26 @@
+"use client";
+
 import Link from "next/link";
-import { Mail, Lock, User, ArrowRight, CalendarCheck, CheckCircle2 } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, CalendarCheck, CheckCircle2, AlertCircle } from "lucide-react";
+import { signUp } from "@/actions/auth";
+import { useState } from "react";
 
 export default function RegisterPage() {
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(formData: FormData) {
+    setLoading(true);
+    setError(null);
+    
+    const result = await signUp(formData);
+    
+    if (result?.error) {
+      setError(result.error);
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-6 py-12 dark:bg-zinc-950">
       <div className="w-full max-w-md">
@@ -22,7 +41,14 @@ export default function RegisterPage() {
         </div>
 
         <div className="mt-10 rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-          <form className="space-y-4">
+          {error && (
+            <div className="mb-6 flex items-center gap-2 rounded-xl bg-red-50 p-4 text-sm font-medium text-red-600 dark:bg-red-900/20 dark:text-red-400">
+              <AlertCircle className="h-5 w-5" />
+              {error}
+            </div>
+          )}
+
+          <form action={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5" htmlFor="name">
                 Nama Lengkap
@@ -34,6 +60,7 @@ export default function RegisterPage() {
                 <input
                   type="text"
                   id="name"
+                  name="name"
                   className="block w-full rounded-xl border border-zinc-200 bg-zinc-50 py-3 pl-11 pr-4 text-zinc-900 focus:border-blue-500 focus:ring-blue-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 sm:text-sm transition-all"
                   placeholder="John Doe"
                   required
@@ -52,6 +79,7 @@ export default function RegisterPage() {
                 <input
                   type="email"
                   id="email"
+                  name="email"
                   className="block w-full rounded-xl border border-zinc-200 bg-zinc-50 py-3 pl-11 pr-4 text-zinc-900 focus:border-blue-500 focus:ring-blue-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 sm:text-sm transition-all"
                   placeholder="name@company.com"
                   required
@@ -70,6 +98,8 @@ export default function RegisterPage() {
                 <input
                   type="password"
                   id="password"
+                  name="password"
+                  minLength={8}
                   className="block w-full rounded-xl border border-zinc-200 bg-zinc-50 py-3 pl-11 pr-4 text-zinc-900 focus:border-blue-500 focus:ring-blue-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 sm:text-sm transition-all"
                   placeholder="Minimal 8 karakter"
                   required
@@ -93,9 +123,10 @@ export default function RegisterPage() {
 
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-bold text-white transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-[0.98]"
+              disabled={loading}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-bold text-white transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Daftar Akun <ArrowRight className="h-4 w-4" />
+              {loading ? "Memproses..." : "Daftar Akun"} <ArrowRight className="h-4 w-4" />
             </button>
           </form>
 
