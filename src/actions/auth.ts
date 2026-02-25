@@ -60,7 +60,11 @@ export async function signIn(formData: FormData) {
 
     // Set a basic session cookie (simplest implementation)
     const cookieStore = await cookies();
-    cookieStore.set("session", JSON.stringify({ userId: user.id, email: user.email }), {
+    cookieStore.set("session", JSON.stringify({ 
+      userId: user.id, 
+      email: user.email,
+      role: user.role
+    }), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24 * 7, // 1 week
@@ -77,4 +81,15 @@ export async function signOut() {
   const cookieStore = await cookies();
   cookieStore.delete("session");
   redirect("/");
+}
+
+export async function getSession() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("session");
+  if (!session) return null;
+  try {
+    return JSON.parse(session.value);
+  } catch (error) {
+    return null;
+  }
 }
