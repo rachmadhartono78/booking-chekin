@@ -21,12 +21,12 @@ export async function signUp(formData: FormData) {
         password, // TODO: Hash this password before storing it
       },
     });
+
+    return { success: true };
   } catch (error: any) {
     if (error.code === 'P2002') {
       return { error: "Email already exists" };
     }
     return { error: "Something went wrong" };
   }
-
-  redirect("/login");
 }
