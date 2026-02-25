@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { hash, compare } from "bcryptjs";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function signUp(formData: FormData) {
   const name = formData.get("name") as string;
@@ -70,4 +71,10 @@ export async function signIn(formData: FormData) {
   } catch (error) {
     return { error: "An unexpected error occurred" };
   }
+}
+
+export async function signOut() {
+  const cookieStore = await cookies();
+  cookieStore.delete("session");
+  redirect("/");
 }

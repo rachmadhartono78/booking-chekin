@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Bell
 } from "lucide-react";
+import { signOut } from "@/actions/auth";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -65,7 +66,10 @@ export default function DashboardLayout({
           </nav>
 
           <div className="p-4 border-t border-zinc-100 dark:border-zinc-800">
-            <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-red-600 transition-all hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20">
+            <button 
+              onClick={() => signOut()}
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-red-600 transition-all hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+            >
               <LogOut className="h-5 w-5" />
               Keluar
             </button>
