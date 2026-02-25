@@ -63,7 +63,7 @@ export async function signIn(formData: FormData) {
     cookieStore.set("session", JSON.stringify({ 
       userId: user.id, 
       email: user.email,
-      role: user.role
+      role: (user as any).role
     }), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
