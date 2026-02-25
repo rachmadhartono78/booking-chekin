@@ -1,7 +1,30 @@
+"use client";
+
 import Link from "next/link";
-import { Mail, Lock, ArrowRight, CalendarCheck, Chrome, Github } from "lucide-react";
+import { Mail, Lock, ArrowRight, CalendarCheck, Chrome, Github, AlertCircle } from "lucide-react";
+import { signIn } from "@/actions/auth";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  async function handleSubmit(formData: FormData) {
+    setLoading(true);
+    setError(null);
+    
+    const result = await signIn(formData);
+    
+    if (result?.error) {
+      setError(result.error);
+      setLoading(false);
+    } else if (result?.success) {
+      router.push("/dashboard");
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-6 py-12 dark:bg-zinc-950">
       <div className="w-full max-w-md">
@@ -22,7 +45,14 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-10 rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-          <form className="space-y-5">
+          {error && (
+            <div className="mb-6 flex items-center gap-2 rounded-xl bg-red-50 p-4 text-sm font-medium text-red-600 dark:bg-red-900/20 dark:text-red-400">
+              <AlertCircle className="h-5 w-5" />
+              {error}
+            </div>
+          )}
+
+          <form action={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5" htmlFor="email">
                 Alamat Email
@@ -34,6 +64,7 @@ export default function LoginPage() {
                 <input
                   type="email"
                   id="email"
+                  name="email"
                   className="block w-full rounded-xl border border-zinc-200 bg-zinc-50 py-3 pl-11 pr-4 text-zinc-900 focus:border-blue-500 focus:ring-blue-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 sm:text-sm transition-all"
                   placeholder="name@company.com"
                   required
@@ -57,6 +88,7 @@ export default function LoginPage() {
                 <input
                   type="password"
                   id="password"
+                  name="password"
                   className="block w-full rounded-xl border border-zinc-200 bg-zinc-50 py-3 pl-11 pr-4 text-zinc-900 focus:border-blue-500 focus:ring-blue-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 sm:text-sm transition-all"
                   placeholder="••••••••"
                   required
@@ -66,9 +98,10 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-bold text-white transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-[0.98]"
+              disabled={loading}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-bold text-white transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Masuk Sekarang <ArrowRight className="h-4 w-4" />
+              {loading ? "Masuk..." : "Masuk Sekarang"} <ArrowRight className="h-4 w-4" />
             </button>
           </form>
 

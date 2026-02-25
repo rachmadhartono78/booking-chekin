@@ -1,7 +1,8 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { redirect } from "next/navigation";
+import { hash, compare } from "bcryptjs";
+import { cookies } from "next/headers";
 
 export async function signUp(formData: FormData) {
   const name = formData.get("name") as string;
@@ -13,12 +14,14 @@ export async function signUp(formData: FormData) {
   }
 
   try {
-    // Basic user creation (Note: In a real app, you MUST hash the password)
+    // Securely hash the password
+    const hashedPassword = await hash(password, 12);
+
     await prisma.user.create({
       data: {
         name,
         email,
-        password, // TODO: Hash this password before storing it
+        password: hashedPassword,
       },
     });
 
@@ -28,5 +31,43 @@ export async function signUp(formData: FormData) {
       return { error: "Email already exists" };
     }
     return { error: "Something went wrong" };
+  }
+}
+
+export async function signIn(formData: FormData) {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  if (!email || !password) {
+    return { error: "Email and password are required" };
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return { error: "Email or password incorrect" };
+    }
+
+    const isPasswordValid = await compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return { error: "Email or password incorrect" };
+    }
+
+    // Set a basic session cookie (simplest implementation)
+    const cookieStore = await cookies();
+    cookieStore.set("session", JSON.stringify({ userId: user.id, email: user.email }), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+      path: "/",
+    });
+
+    return { success: true };
+  } catch (error) {
+    return { error: "An unexpected error occurred" };
   }
 }
