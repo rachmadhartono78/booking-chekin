@@ -14,7 +14,7 @@ export async function createBooking(formData: FormData) {
   }
 
   try {
-    const booking = await prisma.booking.create({
+    const booking = await (prisma as any).booking.create({
       data: {
         userId,
         locationId,
@@ -32,7 +32,7 @@ export async function createBooking(formData: FormData) {
 
 export async function getBookings(filters?: { userId?: number; status?: any }) {
   try {
-    return await prisma.booking.findMany({
+    return await (prisma as any).booking.findMany({
       where: filters,
       include: {
         location: true,
@@ -48,7 +48,7 @@ export async function getBookings(filters?: { userId?: number; status?: any }) {
 
 export async function updateBookingStatus(id: number, status: any) {
   try {
-    await prisma.booking.update({
+    await (prisma as any).booking.update({
       where: { id },
       data: { status },
     });
@@ -62,7 +62,7 @@ export async function updateBookingStatus(id: number, status: any) {
 
 export async function deleteBooking(id: number) {
   try {
-    await prisma.booking.delete({
+    await (prisma as any).booking.delete({
       where: { id },
     });
     revalidatePath("/dashboard/bookings");

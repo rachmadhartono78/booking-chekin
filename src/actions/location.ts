@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 
 export async function getLocations() {
   try {
-    return await prisma.location.findMany({
+    return await (prisma as any).location.findMany({
       orderBy: { createdAt: "desc" },
     });
   } catch (error) {
@@ -25,7 +25,7 @@ export async function createLocation(formData: FormData) {
   }
 
   try {
-    await prisma.location.create({
+    await (prisma as any).location.create({
       data: {
         name,
         address,
@@ -47,7 +47,7 @@ export async function updateLocation(id: number, formData: FormData) {
   const description = formData.get("description") as string;
 
   try {
-    await prisma.location.update({
+    await (prisma as any).location.update({
       where: { id },
       data: {
         name,
@@ -65,7 +65,7 @@ export async function updateLocation(id: number, formData: FormData) {
 
 export async function deleteLocation(id: number) {
   try {
-    await prisma.location.delete({
+    await (prisma as any).location.delete({
       where: { id },
     });
     revalidatePath("/dashboard/locations");
